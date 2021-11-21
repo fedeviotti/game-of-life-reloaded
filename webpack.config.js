@@ -13,6 +13,7 @@ module.exports = {
       directory: path.join(__dirname, 'src'),
     },
     open: true,
+    historyApiFallback: true,
   },
   module: {
     rules: [
