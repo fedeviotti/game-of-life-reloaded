@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 const GameOfLife: React.FC = () => {
-  return <p>Game of Life</p>;
+  return <div>Game of Life</div>;
 };
 
 export default GameOfLife;

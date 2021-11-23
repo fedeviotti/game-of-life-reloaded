@@ -4,17 +4,17 @@ import styles from '../styles/layout.module.css';
 
 const Layout: React.FC = () => {
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <header className={styles.header}>
-        <Link to="/">Home</Link>
         <nav>
+          <Link to="/">Home</Link>
           <Link to="/game-of-life">Game of Life</Link>
         </nav>
       </header>
       <main className={styles.content}>
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };
 
