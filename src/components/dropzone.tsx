@@ -19,9 +19,12 @@ const Dropzone: React.FC = () => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div {...getRootProps()}>
+    <div
+      className="border-dashed border-2 w-full h-32 rounded flex justify-center items-center"
+      {...getRootProps()}
+    >
       <input {...getInputProps()} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
+      <p>Drop your files here</p>
     </div>
   );
 };
