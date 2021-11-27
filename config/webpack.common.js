@@ -2,33 +2,27 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.tsx',
-  output: { path: path.join(__dirname, 'build'), filename: 'index.bundle.js' },
-  mode: process.env.NODE_ENV || 'development',
+  entry: { app: './src/index.tsx' },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'src'),
-    },
-    open: true,
-    historyApiFallback: true,
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
+        include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/,
         use: ['babel-loader'],
       },
       {
         test: /\.(ts|tsx)$/,
+        include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/,
         use: ['ts-loader'],
       },
       {
         test: /\.(css|scss)$/,
+        include: path.resolve(__dirname, '../src'),
         use: [
           'style-loader',
           {
@@ -45,13 +39,14 @@ module.exports = {
       },
       {
         test: /\.(jpg|jpeg|png|gif|mp3|svg)$/,
+        include: path.resolve(__dirname, '../src'),
         use: ['file-loader'],
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src', 'index.html'),
+      template: path.join(__dirname, '../public', 'index.html'),
     }),
   ],
 };

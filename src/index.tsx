@@ -7,6 +7,10 @@ import './index.css';
 import App from './app';
 import { store } from './store/store';
 
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Looks like we are in development mode!');
+}
+
 Sentry.init({
   dsn: 'https://ce88c11ee28e4c32b5bea9629f3ad2f2@o1079106.ingest.sentry.io/6083740',
   integrations: [new Integrations.BrowserTracing()],
