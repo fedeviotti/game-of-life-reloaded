@@ -9,7 +9,7 @@
 /coverage
 
 # production
-/build
+/dist
 
 # misc
 .DS_Store
@@ -24,3 +24,9 @@ yarn-error.log*
 
 # JetBrains IDE
 .idea
+
+# Local Netlify folder
+.netlify
+
+# dotenv file
+.env
