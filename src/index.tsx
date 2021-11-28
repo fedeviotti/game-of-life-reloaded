@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 Sentry.init({
-  dsn: 'https://ce88c11ee28e4c32b5bea9629f3ad2f2@o1079106.ingest.sentry.io/6083740',
+  dsn: process.env.REACT_APP_SENTRY_DSN,
   integrations: [new Integrations.BrowserTracing()],
 
   // Set tracesSampleRate to 1.0 to capture 100%

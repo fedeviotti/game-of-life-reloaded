@@ -24,3 +24,9 @@ yarn-error.log*
 
 # JetBrains IDE
 .idea
+
+# Local Netlify folder
+.netlify
+
+# dotenv file
+.env
