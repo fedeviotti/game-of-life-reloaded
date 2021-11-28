@@ -14,6 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 Sentry.init({
   dsn: process.env.REACT_APP_SENTRY_DSN,
   integrations: [new Integrations.BrowserTracing()],
+  environment: process.env.NODE_ENV,
 
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
