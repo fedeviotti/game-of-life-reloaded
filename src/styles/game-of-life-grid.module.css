@@ -1,0 +1,29 @@
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(60, 15px);
+    grid-template-rows: repeat(60, 15px);
+    grid-gap: 1px;
+    margin: auto;
+    max-width: 900px;
+}
+
+.gridContainer div {
+    /*background-color: red;*/
+    height: 15px;
+    width: 15px;
+    border-radius: 1px;
+    transition: all 0.2s;
+}
+
+.gridContainer .live {
+    background-color: #F9A825;
+
+}
+
+.gridContainer .dead {
+     /*background-color: black;*/
+}
+
+.gridContainer .new {
+    background-color: red;
+}
