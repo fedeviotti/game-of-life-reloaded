@@ -130,7 +130,7 @@ const calculate = function (grid: CellInterface[][]): {
       nextGrid[j][i] = {
         id: cell.id,
         currentState: cell.nextState as number,
-        nextState: cell.currentState,
+        nextState: null,
       };
       nextDomCells.push({
         id: cell.id,
@@ -160,7 +160,7 @@ const GameOfLifeGrid: React.FC = () => {
   React.useEffect(() => {
     setTimeout(() => {
       run();
-    }, 0);
+    }, 100);
   }, [domCells]);
 
   return (
