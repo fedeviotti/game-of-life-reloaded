@@ -13,7 +13,14 @@ interface DomCellInterface {
   className: string;
 }
 
-const MAX = 60;
+const ROWS = 5;
+const COLS = 5;
+const TOTAL_GRID_CELLS = ROWS * COLS;
+
+const calcY = (x: number) => Math.floor(x / COLS);
+const calcX = (x: number) => x - COLS * calcY(x);
+
+const calcI = (x: number, y: number) => y * COLS + x;
 
 const idOf = (h: number, v: number): string => `i-${h}-${v}`;
 
@@ -24,86 +31,72 @@ const createCell = (h: number, v: number): CellInterface => ({
 });
 
 const initGrid = () => {
-  const grid: CellInterface[][] = [];
-  for (let i = 0; i < MAX; i++) {
-    grid[i] = [];
-    for (let j = 0; j < MAX; j++) {
-      grid[i][j] = { id: '', currentState: 0, nextState: null };
-    }
+  const grid: CellInterface[] = [];
+  for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
+    grid[i] = { id: '', currentState: 0, nextState: null };
   }
   return grid;
 };
 
-const createGrid = (grid: CellInterface[][]) => {
-  for (let i = 0; i < MAX; i++) {
-    grid[i] = [];
-    for (let j = 0; j < MAX; j++) {
-      grid[i][j] = createCell(i, j);
-    }
+const createGrid = (grid: CellInterface[]) => {
+  for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
+    grid[i] = createCell(calcX(i), calcY(i));
   }
   return grid;
 };
 
-const firstPaint = (grid: CellInterface[][]): DomCellInterface[] => {
+const firstPaint = (grid: CellInterface[]): DomCellInterface[] => {
   const firstDomCells: DomCellInterface[] = [];
-  for (let i = 0; i < MAX; i++) {
-    for (let j = 0; j < MAX; j++) {
-      let cell = grid[j][i];
-      let domCell = { id: cell.id, className: '' };
-      let R = Math.random();
-      if (R <= 0.5) {
-        cell.currentState = 0;
-        domCell.className = styles.dead;
-      } else {
-        cell.currentState = 1;
-        domCell.className = styles.live;
-      }
-      // if (
-      //   (i === 1 && j === 2) ||
-      //   (i === 2 && j === 3) ||
-      //   (i === 3 && j === 1) ||
-      //   (i === 3 && j === 2) ||
-      //   (i === 3 && j === 3)
-      // ) {
-      //   cell.currentState = 1;
-      //   domCell.className = styles.live;
-      // } else {
-      //   cell.currentState = 0;
-      //   domCell.className = styles.dead;
-      // }
-      firstDomCells.push(domCell);
+  for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
+    let cell = grid[i];
+    let domCell = { id: cell.id, className: '' };
+    // let R = Math.random();
+    // if (R <= 0.5) {
+    //   cell.currentState = 0;
+    //   domCell.className = styles.dead;
+    // } else {
+    //   cell.currentState = 1;
+    //   domCell.className = styles.live;
+    // }
+    if (i === 7 || i === 13 || i === 16 || i === 17 || i === 18) {
+      cell.currentState = 1;
+      domCell.className = styles.live;
+    } else {
+      cell.currentState = 0;
+      domCell.className = styles.dead;
     }
+    firstDomCells.push(domCell);
   }
   return firstDomCells;
 };
 
-const neighboursCoords = (x: number, y: number) => ({
-  NW: x === 0 || y === 0 ? null : [x - 1, y - 1],
-  N: y === 0 ? null : [x, y - 1],
-  NE: x === MAX - 1 || y === 0 ? null : [x + 1, y - 1],
-  E: x === MAX - 1 ? null : [x + 1, y],
-  SE: x === MAX - 1 || y === MAX - 1 ? null : [x + 1, y + 1],
-  S: y === MAX - 1 ? null : [x, y + 1],
-  SW: y === MAX - 1 || x === 0 ? null : [x - 1, y + 1],
-  W: x === 0 ? null : [x - 1, y],
-});
+const neighboursCoords = (i: number) => {
+  const x = calcX(i);
+  const y = calcY(i);
+  return {
+    NW: x === 0 || y === 0 ? null : [calcI(x - 1, y - 1)],
+    N: y === 0 ? null : [calcI(x, y - 1)],
+    NE: x === COLS - 1 || y === 0 ? null : [calcI(x + 1, y - 1)],
+    E: x === COLS - 1 ? null : [calcI(x + 1, y)],
+    SE: x === COLS - 1 || y === ROWS - 1 ? null : [calcI(x + 1, y + 1)],
+    S: y === ROWS - 1 ? null : [calcI(x, y + 1)],
+    SW: y === ROWS - 1 || x === 0 ? null : [calcI(x - 1, y + 1)],
+    W: x === 0 ? null : [calcI(x - 1, y)],
+  };
+};
 
-const getNextState = (
-  x: number,
-  y: number,
-  grid: CellInterface[][],
-): CellInterface => {
+const getNextState = (i: number, grid: CellInterface[]): CellInterface => {
   let liveNeighbours = 0;
-  let nbrs = neighboursCoords(x, y);
+  let nbrs = neighboursCoords(i);
 
   Object.values(nbrs)
-    .filter((i) => i !== null)
+    .filter((n) => n !== null)
     // @ts-ignore
-    .forEach(([nX, nY]) => {
-      liveNeighbours += grid[nX][nY].currentState;
+    .forEach(([nX]) => {
+      liveNeighbours += grid[nX].currentState;
     });
 
-  let currentCell = grid[x][y];
+  let currentCell = grid[i];
 
   if (currentCell.currentState === 0 && liveNeighbours === 3) {
     currentCell.nextState = 1;
@@ -118,25 +111,23 @@ const getNextState = (
   return currentCell;
 };
 
-const calculate = function (grid: CellInterface[][]): {
-  nextGrid: CellInterface[][];
+const calculate = function (grid: CellInterface[]): {
+  nextGrid: CellInterface[];
   nextDomCells: DomCellInterface[];
 } {
   const nextDomCells: DomCellInterface[] = [];
-  const nextGrid: CellInterface[][] = initGrid();
-  for (let i = 0; i < MAX; i++) {
-    for (let j = 0; j < MAX; j++) {
-      const cell: CellInterface = getNextState(j, i, grid);
-      nextGrid[j][i] = {
-        id: cell.id,
-        currentState: cell.nextState as number,
-        nextState: null,
-      };
-      nextDomCells.push({
-        id: cell.id,
-        className: cell.nextState === 1 ? styles.new : styles.dead,
-      });
-    }
+  const nextGrid: CellInterface[] = initGrid();
+  for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
+    const cell: CellInterface = getNextState(i, grid);
+    nextGrid[i] = {
+      id: cell.id,
+      currentState: cell.nextState as number,
+      nextState: null,
+    };
+    nextDomCells.push({
+      id: cell.id,
+      className: cell.nextState === 1 ? styles.new : styles.dead,
+    });
   }
   window.console.log('[nextGrid]', nextGrid);
   window.console.log('[nextDomCells]', nextDomCells);
@@ -144,7 +135,7 @@ const calculate = function (grid: CellInterface[][]): {
 };
 
 const GameOfLifeGrid: React.FC = () => {
-  const [grid, setGrid] = React.useState<CellInterface[][]>(createGrid([]));
+  const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
   const [domCells, setDomCells] = React.useState<DomCellInterface[]>([]);
 
   React.useEffect(() => {
