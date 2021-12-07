@@ -1,9 +1,14 @@
 import * as React from 'react';
 import Dropzone from '../components/dropzone';
 import GameOfLifeGrid from '../components/game-of-life-grid';
+import { INITIAL_TIMEOUT_DELAY } from '../constants/grid-info';
 
 const GameOfLife: React.FC = () => {
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
+  const [timeoutDelay, setTimeoutDelay] = React.useState<number>(
+    INITIAL_TIMEOUT_DELAY,
+  );
+
   return (
     <div className="flex flex-row gap-5 justify-between">
       <div className="flex flex-col gap-5">
@@ -21,7 +26,7 @@ const GameOfLife: React.FC = () => {
           Stop
         </button>
       </div>
-      <GameOfLifeGrid isRunning={isRunning} />
+      <GameOfLifeGrid isRunning={isRunning} timeoutDelay={timeoutDelay} />
     </div>
   );
 };
