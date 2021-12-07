@@ -9,8 +9,12 @@ interface CellInterface {
   className: string;
 }
 
-const ROWS = 5;
-const COLS = 5;
+interface GameOfLifeGridProps {
+  isRunning: boolean;
+}
+
+const ROWS = 30;
+const COLS = 30;
 const TOTAL_GRID_CELLS = ROWS * COLS;
 
 const calcY = (x: number) => Math.floor(x / COLS);
@@ -38,21 +42,21 @@ const firstPaint = (grid: CellInterface[]): CellInterface[] => {
   const nextGrid: CellInterface[] = [];
   for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
     let cell = grid[i];
-    // let R = Math.random();
-    // if (R <= 0.5) {
-    //   cell.currentState = 0;
-    //   domCell.className = styles.dead;
-    // } else {
-    //   cell.currentState = 1;
-    //   domCell.className = styles.live;
-    // }
-    if (i === 7 || i === 13 || i === 16 || i === 17 || i === 18) {
-      cell.currentState = 1;
-      cell.className = styles.live;
-    } else {
+    let R = Math.random();
+    if (R <= 0.5) {
       cell.currentState = 0;
       cell.className = styles.dead;
+    } else {
+      cell.currentState = 1;
+      cell.className = styles.live;
     }
+    // if (i === 7 || i === 13 || i === 16 || i === 17 || i === 18) {
+    //   cell.currentState = 1;
+    //   cell.className = styles.live;
+    // } else {
+    //   cell.currentState = 0;
+    //   cell.className = styles.dead;
+    // }
     nextGrid.push(cell);
   }
   return nextGrid;
@@ -110,11 +114,11 @@ const calculate = function (grid: CellInterface[]): CellInterface[] {
       className: cell.nextState === 1 ? styles.new : styles.dead,
     };
   }
-  window.console.log('[nextGrid]', nextGrid);
+  // window.console.log('[nextGrid]', nextGrid);
   return nextGrid;
 };
 
-const GameOfLifeGrid: React.FC = () => {
+const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({ isRunning }) => {
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
 
   React.useEffect(() => {
@@ -126,21 +130,24 @@ const GameOfLifeGrid: React.FC = () => {
   };
 
   React.useEffect(() => {
-    setTimeout(() => {
-      run();
-    }, 100);
-  }, [grid]);
+    let timeout: NodeJS.Timeout;
+    if (isRunning) {
+      timeout = setTimeout(() => {
+        run();
+      }, 0);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isRunning, grid]);
 
   return (
-    <>
-      <button onClick={run}>Click</button>
-      <div className={styles.gridContainer}>
-        {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
-        {grid.map((cell) => {
-          return <div key={cell.id} className={cell.className} />;
-        })}
-      </div>
-    </>
+    <div className={styles.gridContainer}>
+      {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
+      {grid.map((cell) => {
+        return <div key={cell.id} className={cell.className} />;
+      })}
+    </div>
   );
 };
 

@@ -41,7 +41,7 @@ module.exports = {
       {
         test: /\.(jpg|jpeg|png|gif|mp3|svg)$/,
         include: path.resolve(__dirname, '../src'),
-        use: ['file-loader'],
+        type: 'asset/resource',
       },
     ],
   },

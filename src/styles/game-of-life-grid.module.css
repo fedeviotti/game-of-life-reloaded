@@ -1,24 +1,25 @@
 .gridContainer {
     display: grid;
-    grid-template-columns: repeat(5, 15px);
-    grid-template-rows: repeat(5, 15px);
+    grid-template-columns: repeat(30, 20px);
+    grid-template-rows: repeat(30, 20px);
     grid-gap: 1px;
-    margin: auto;
+    /*margin: auto 5rem;*/
     max-width: 900px;
+    @apply p-1;
+    @apply rounded bg-gray-700;
 }
 
 .gridContainer div {
     /*background-color: red;*/
-    height: 15px;
-    width: 15px;
-    border-radius: 1px;
+    height: 20px;
+    width: 20px;
     transition: all 0.2s;
-    border: 1px solid black;
+    @apply rounded-sm bg-gray-800;
+    @apply border border-solid border-gray-700;
 }
 
 .gridContainer .live {
-    background-color: #F9A825;
-
+    @apply bg-red-500;
 }
 
 .gridContainer .dead {
@@ -26,5 +27,5 @@
 }
 
 .gridContainer .new {
-    background-color: red;
+    @apply bg-yellow-600;
 }

@@ -46,7 +46,7 @@ const Dropzone: React.FC = () => {
 
   return (
     <div
-      className="border-dashed border-2 w-full h-32 rounded flex justify-center items-center"
+      className="border-dashed border-2 w-48 h-32 rounded flex justify-center items-center"
       {...getRootProps()}
     >
       <input {...getInputProps()} />
