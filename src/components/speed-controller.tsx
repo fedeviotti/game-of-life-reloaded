@@ -32,7 +32,7 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
 }) => {
   const [isDecreaseDisabled, setIsDecreaseDisabled] =
     React.useState<boolean>(false);
-  const [hovered, setHovered] = React.useState(true);
+  const [isShowing, setIsShowing] = React.useState(false);
   const [referenceElement, setReferenceElement] =
     React.useState<HTMLButtonElement | null>(null);
   const [popperElement, setPopperElement] =
@@ -84,8 +84,8 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
     });
   };
 
-  const mouseEnterHandler = () => setHovered(true);
-  const mouseLeaveHandler = () => setHovered(true);
+  const mouseEnterHandler = () => setIsShowing(true);
+  const mouseLeaveHandler = () => setIsShowing(false);
 
   return (
     <span className="relative z-0 inline-flex shadow-sm rounded-md">
@@ -118,7 +118,7 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
       </button>
 
       <Transition
-        show={hovered}
+        show={isShowing}
         enter="transition-opacity duration-75"
         enterFrom="opacity-0"
         enterTo="opacity-100"
