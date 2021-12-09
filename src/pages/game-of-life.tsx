@@ -13,7 +13,7 @@ const GameOfLife: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-row gap-5 justify-between">
+    <div className="flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center">
       <div className="flex flex-col gap-5 items-center">
         <Dropzone />
         <div className="flex gap-5">

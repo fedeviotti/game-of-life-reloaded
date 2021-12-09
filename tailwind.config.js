@@ -1,7 +1,8 @@
 const colors = require('tailwindcss/colors');
 
 module.exports = {
-  purge: ['./src/**/*.html', './src/**/*.js'],
+  mode: 'jit',
+  purge: ['./public/**/*.html', './src/**/*.{js,jsx,ts,tsx,vue}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
     fontFamily: {
@@ -15,6 +16,20 @@ module.exports = {
       },
       borderRadius: {
         '4xl': '2rem',
+      },
+      gridTemplateColumns: {
+        // Simple 15 and 30 column grid
+        15: 'repeat(15, minmax(min-content, 1fr))',
+        20: 'repeat(20, minmax(min-content, 1fr))',
+        25: 'repeat(25, minmax(min-content, 1fr))',
+        30: 'repeat(30, minmax(min-content, 1fr))',
+      },
+      gridTemplateRows: {
+        // Simple 15 and 30 row grid
+        15: 'repeat(15, minmax(min-content, 1fr))',
+        20: 'repeat(20, minmax(min-content, 1fr))',
+        25: 'repeat(25, minmax(min-content, 1fr))',
+        30: 'repeat(30, minmax(min-content, 1fr))',
       },
     },
   },

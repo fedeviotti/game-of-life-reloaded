@@ -1,7 +1,7 @@
 .gridContainer {
     display: grid;
-    grid-template-columns: repeat(30, 20px);
-    grid-template-rows: repeat(30, 20px);
+    @apply grid-cols-20;
+    @apply grid-rows-20;
     grid-gap: 1px;
     /*margin: auto 5rem;*/
     max-width: 900px;
@@ -11,8 +11,8 @@
 
 .gridContainer div {
     /*background-color: red;*/
-    height: 20px;
-    width: 20px;
+    @apply h-4 md:h-7;
+    @apply w-4 md:w-7;
     transition: all 0.2s;
     @apply rounded-sm bg-gray-800;
     @apply border border-solid border-gray-700;
