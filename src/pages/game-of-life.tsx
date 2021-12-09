@@ -21,6 +21,7 @@ const GameOfLife: React.FC = () => {
           <Button label="Stop" onClick={() => setIsRunning(false)} />
         </div>
         <SpeedController
+          timeoutDelay={timeoutDelay}
           setTimeoutDelay={setTimeoutDelay}
           isRunning={isRunning}
         />
