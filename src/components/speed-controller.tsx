@@ -1,25 +1,9 @@
 import * as React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
-import { usePopper } from 'react-popper';
-import { Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { TIMEOUT_DELAY_STEP } from '../constants/grid-info';
 
-import styles from '../styles/speed-controller.module.css';
-
-type Placements =
-  | 'top'
-  | 'bottom'
-  | 'right'
-  | 'left'
-  | 'top-start'
-  | 'top-end'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'right-start'
-  | 'right-end'
-  | 'left-start'
-  | 'left-end';
+import Tooltip from './tooltip';
 
 interface SpeedControllerProps {
   setTimeoutDelay: React.Dispatch<React.SetStateAction<number>>;
@@ -32,38 +16,12 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
 }) => {
   const [isDecreaseDisabled, setIsDecreaseDisabled] =
     React.useState<boolean>(false);
-  const [isShowing, setIsShowing] = React.useState(false);
-  const [referenceElement, setReferenceElement] =
+  const [isShowingDecrease, setIsShowingDecrease] = React.useState(false);
+  const [refDecreaseElement, setRefDecreaseElement] =
     React.useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] =
-    React.useState<HTMLDivElement | null>(null);
-  const [arrowElement, setArrowElement] = React.useState<HTMLDivElement | null>(
-    null,
-  );
-  const { styles: popperStyles, attributes } = usePopper(
-    referenceElement,
-    popperElement,
-    {
-      placement: 'bottom',
-      strategy: 'fixed',
-      modifiers: [
-        { name: 'arrow', options: { element: arrowElement } },
-        {
-          name: 'flip',
-          options: {
-            fallbackPlacements: ['top', 'bottom'],
-          },
-        },
-        { name: 'eventListeners', enabled: true },
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 5],
-          },
-        },
-      ],
-    },
-  );
+  const [isShowingIncrease, setIsShowingIncrease] = React.useState(false);
+  const [refIncreaseElement, setRefIncreaseElement] =
+    React.useState<HTMLButtonElement | null>(null);
 
   const onDecreaseHandler = () => {
     setTimeoutDelay((prevState) => {
@@ -84,15 +42,22 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
     });
   };
 
-  const mouseEnterHandler = () => setIsShowing(true);
-  const mouseLeaveHandler = () => setIsShowing(false);
+  const mouseHandler = (
+    setIsShow: React.Dispatch<React.SetStateAction<boolean>>,
+    value: boolean,
+  ) => setIsShow(value);
 
   return (
     <span className="relative z-0 inline-flex shadow-sm rounded-md">
+      <Tooltip
+        text="Speed Up"
+        isShowing={isShowingDecrease}
+        referenceElement={refDecreaseElement}
+      />
       <button
-        ref={setReferenceElement}
-        onMouseEnter={mouseEnterHandler}
-        onMouseLeave={mouseLeaveHandler}
+        ref={setRefDecreaseElement}
+        onMouseEnter={() => mouseHandler(setIsShowingDecrease, true)}
+        onMouseLeave={() => mouseHandler(setIsShowingDecrease, false)}
         type="button"
         className={classNames(
           { 'hover:bg-gray-50': isRunning && !isDecreaseDisabled },
@@ -104,7 +69,16 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
         <span className="sr-only">Decrease Speed</span>
         <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
       </button>
+
+      <Tooltip
+        text="Speed Down"
+        isShowing={isShowingIncrease}
+        referenceElement={refIncreaseElement}
+      />
       <button
+        ref={setRefIncreaseElement}
+        onMouseEnter={() => mouseHandler(setIsShowingIncrease, true)}
+        onMouseLeave={() => mouseHandler(setIsShowingIncrease, false)}
         type="button"
         className={classNames(
           { 'hover:bg-gray-50': isRunning },
@@ -116,32 +90,6 @@ const SpeedController: React.FC<SpeedControllerProps> = ({
         <span className="sr-only">Increase Speed</span>
         <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
       </button>
-
-      <Transition
-        show={isShowing}
-        enter="transition-opacity duration-75"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition-opacity duration-150"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-      >
-        <div
-          className={styles.tooltip}
-          ref={setPopperElement}
-          style={popperStyles.popper}
-          {...attributes.popper}
-        >
-          <div className="bg-gray-800 text-gray-100 relative p-2 text-xs rounded shadow">
-            <div>Speed Up</div>
-          </div>
-          <div
-            className={styles.arrow}
-            ref={setArrowElement}
-            style={popperStyles.arrow}
-          />
-        </div>
-      </Transition>
     </span>
   );
 };
