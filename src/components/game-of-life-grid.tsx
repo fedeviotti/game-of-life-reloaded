@@ -15,17 +15,28 @@ export interface CellInterface {
 interface GameOfLifeGridProps {
   isRunning: boolean;
   timeoutDelay: number;
+  reset: boolean;
+  onResetComplete: () => void;
 }
 
 const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
   isRunning,
   timeoutDelay,
+  reset,
+  onResetComplete,
 }) => {
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
 
   React.useEffect(() => {
     setGrid(firstPaint(grid));
   }, []);
+
+  React.useEffect(() => {
+    if (reset) {
+      setGrid(firstPaint(grid));
+      onResetComplete();
+    }
+  }, [reset]);
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout;

@@ -11,6 +11,12 @@ const GameOfLife: React.FC = () => {
   const [timeoutDelay, setTimeoutDelay] = React.useState<number>(
     INITIAL_TIMEOUT_DELAY,
   );
+  const [reset, setReset] = React.useState<boolean>(false);
+
+  const onResetHandler = () => {
+    setIsRunning(false);
+    setReset(true);
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center">
@@ -19,6 +25,7 @@ const GameOfLife: React.FC = () => {
         <div className="flex gap-5">
           <Button label="Start" onClick={() => setIsRunning(true)} />
           <Button label="Stop" onClick={() => setIsRunning(false)} />
+          <Button label="Reset" onClick={onResetHandler} />
         </div>
         <SpeedController
           timeoutDelay={timeoutDelay}
@@ -27,7 +34,12 @@ const GameOfLife: React.FC = () => {
         />
       </div>
 
-      <GameOfLifeGrid isRunning={isRunning} timeoutDelay={timeoutDelay} />
+      <GameOfLifeGrid
+        isRunning={isRunning}
+        timeoutDelay={timeoutDelay}
+        reset={reset}
+        onResetComplete={() => setReset(false)}
+      />
     </div>
   );
 };
