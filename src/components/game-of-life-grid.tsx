@@ -17,6 +17,7 @@ interface GameOfLifeGridProps {
   timeoutDelay: number;
   reset: boolean;
   onResetComplete: () => void;
+  onCounterChange: (increment: number) => void;
 }
 
 const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
@@ -24,7 +25,9 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
   timeoutDelay,
   reset,
   onResetComplete,
+  onCounterChange,
 }) => {
+  window.console.log('[GameOfLifeGrid Render]');
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
 
   React.useEffect(() => {
@@ -43,6 +46,7 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
     if (isRunning) {
       timeout = setTimeout(() => {
         setGrid(calculate(grid));
+        onCounterChange(1);
       }, timeoutDelay);
     }
     return () => {

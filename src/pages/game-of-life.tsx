@@ -7,16 +7,22 @@ import Button from '../components/button';
 import SpeedController from '../components/speed-controller';
 
 const GameOfLife: React.FC = () => {
+  window.console.log('[GameOfLife Render]');
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
   const [timeoutDelay, setTimeoutDelay] = React.useState<number>(
     INITIAL_TIMEOUT_DELAY,
   );
   const [reset, setReset] = React.useState<boolean>(false);
+  const [counter, setCounter] = React.useState<number>(0);
 
   const onResetHandler = () => {
     setIsRunning(false);
     setReset(true);
+    setCounter(0);
   };
+
+  const onCounterChange = (increment: number) =>
+    setCounter((prevState) => prevState + increment);
 
   return (
     <div className="flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center">
@@ -27,6 +33,7 @@ const GameOfLife: React.FC = () => {
           <Button label="Stop" onClick={() => setIsRunning(false)} />
           <Button label="Reset" onClick={onResetHandler} />
         </div>
+        <span>Loop Counter: {counter}</span>
         <SpeedController
           timeoutDelay={timeoutDelay}
           setTimeoutDelay={setTimeoutDelay}
@@ -39,6 +46,7 @@ const GameOfLife: React.FC = () => {
         timeoutDelay={timeoutDelay}
         reset={reset}
         onResetComplete={() => setReset(false)}
+        onCounterChange={(increment) => onCounterChange(increment)}
       />
     </div>
   );
