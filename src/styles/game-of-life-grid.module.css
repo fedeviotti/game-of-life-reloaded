@@ -1,7 +1,5 @@
 .gridContainer {
-    display: grid;
-    @apply grid-cols-20;
-    @apply grid-rows-20;
+    @apply grid;
     grid-gap: 1px;
     /*margin: auto 5rem;*/
     max-width: 900px;

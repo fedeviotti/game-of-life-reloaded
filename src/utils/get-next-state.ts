@@ -1,9 +1,14 @@
 import { CellInterface } from '../components/game-of-life-grid';
 import { neighboursCoords } from './neighbours-coords';
 
-const getNextState = (i: number, grid: CellInterface[]): CellInterface => {
+const getNextState = (
+  i: number,
+  grid: CellInterface[],
+  rows?: number,
+  cols?: number,
+): CellInterface => {
   let liveNeighbours = 0;
-  let nbrs = neighboursCoords(i);
+  let nbrs = neighboursCoords(i, rows, cols);
 
   Object.values(nbrs)
     .filter((n) => n !== null)
@@ -12,7 +17,7 @@ const getNextState = (i: number, grid: CellInterface[]): CellInterface => {
       liveNeighbours += grid[nX].currentState;
     });
 
-  let currentCell = grid[i];
+  let currentCell = { ...grid[i] };
 
   if (currentCell.currentState === 0 && liveNeighbours === 3) {
     currentCell.nextState = 1;

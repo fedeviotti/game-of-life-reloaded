@@ -1,5 +1,3 @@
-import { COLS } from '../constants/grid-info';
-
-const calcI = (x: number, y: number) => y * COLS + x;
+const calcI = (x: number, y: number, cols: number) => y * cols + x;
 
 export { calcI };

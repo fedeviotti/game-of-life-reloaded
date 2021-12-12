@@ -2,14 +2,18 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useAppDispatch } from '../store/hooks';
 import {
-  initializeGrid,
+  loadGridFromFile,
   resetGrid,
 } from '../store/slices/game-of-life-grid-slice';
+import { CellInterface } from './game-of-life-grid';
+import styles from '../styles/game-of-life-grid.module.css';
+import { createCell } from '../utils/create-cell';
+import { calcX } from '../utils/calc-x';
+import { calcY } from '../utils/calc-y';
 
 const Dropzone: React.FC = () => {
   const dispatch = useAppDispatch();
   const onDrop = useCallback((acceptedFiles) => {
-    dispatch(resetGrid());
     acceptedFiles.forEach((file: Blob) => {
       const reader = new FileReader();
 
@@ -21,19 +25,36 @@ const Dropzone: React.FC = () => {
         console.log('[binaryStr]', binaryStr);
 
         // Read the string and extract the values for initial state
-        const [generation, rowsAndCols, ...grid] = binaryStr?.split(/\r?\n/);
-        const generationCounter =
-          Number(generation.slice(generation.indexOf(' ') + 1, -1)) | 0;
-        const [rows, cols] = rowsAndCols.split(' ').map((el) => Number(el) | 0);
-        const initialGrid = grid
+        const [generationInfo, gridInfo, ...grid] = binaryStr?.split(/\r?\n/);
+        const counterFromFile =
+          +generationInfo.slice(generationInfo.indexOf(' ') + 1, -1) | 0;
+        const [rows, cols] = gridInfo.split(' ').map((el) => +el | 0);
+        const gridFromFile = grid
           .filter((row) => row.length)
-          .map<boolean[]>((row) => row.split('').map((value) => value === '*'));
-        //console.log('generationCounter', generationCounter);
-        //console.log('rows', rows);
-        //console.log('cols', cols);
-        //console.log('initialGrid', initialGrid);
+          ?.join('')
+          .split('')
+          ?.map<CellInterface>((value: string, index) => {
+            const cell = createCell(calcX(index, cols), calcY(index, cols));
+            if (value === '*') {
+              cell.currentState = 1;
+              cell.className = styles.live;
+              return cell;
+            } else if (value === '.') {
+              cell.currentState = 0;
+              cell.className = styles.dead;
+              return cell;
+            } else {
+              window.console.error('Error in the file format.');
+              return {
+                id: '',
+                currentState: 0,
+                nextState: null,
+                className: 'dead',
+              };
+            }
+          });
         dispatch(
-          initializeGrid({ generationCounter, rows, cols, initialGrid }),
+          loadGridFromFile({ counterFromFile, gridFromFile, rows, cols }),
         );
       };
       // TODO: can we use FileReader.readAsArrayBuffer() instead of readAsText()

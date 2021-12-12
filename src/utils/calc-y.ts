@@ -1,5 +1,3 @@
-import { COLS } from '../constants/grid-info';
-
-const calcY = (x: number) => Math.floor(x / COLS);
+const calcY = (x: number, cols: number) => Math.floor(x / cols);
 
 export { calcY };

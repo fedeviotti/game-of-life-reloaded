@@ -5,20 +5,24 @@ import GameOfLifeGrid from '../components/game-of-life-grid';
 import { INITIAL_TIMEOUT_DELAY } from '../constants/grid-info';
 import Button from '../components/button';
 import SpeedController from '../components/speed-controller';
+import { useAppSelector } from '../store/hooks';
 
 const GameOfLife: React.FC = () => {
-  window.console.log('[GameOfLife Render]');
+  // window.console.log('[GameOfLife Render]');
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
   const [timeoutDelay, setTimeoutDelay] = React.useState<number>(
     INITIAL_TIMEOUT_DELAY,
   );
   const [reset, setReset] = React.useState<boolean>(false);
-  const [counter, setCounter] = React.useState<number>(0);
+  const gridStore = useAppSelector((state) => state.gameOfLifeGrid);
+  const [counter, setCounter] = React.useState<number>(
+    gridStore.counterFromFile || 0,
+  );
 
   const onResetHandler = () => {
     setIsRunning(false);
     setReset(true);
-    setCounter(0);
+    setCounter(gridStore.counterFromFile || 0);
   };
 
   const onCounterChange = (increment: number) =>
@@ -47,6 +51,7 @@ const GameOfLife: React.FC = () => {
         reset={reset}
         onResetComplete={() => setReset(false)}
         onCounterChange={(increment) => onCounterChange(increment)}
+        gridStore={gridStore}
       />
     </div>
   );

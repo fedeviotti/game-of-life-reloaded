@@ -1,10 +1,14 @@
 import { TOTAL_GRID_CELLS } from '../constants/grid-info';
-import styles from '../styles/game-of-life-grid.module.css';
 import { CellInterface } from '../components/game-of-life-grid';
+import styles from '../styles/game-of-life-grid.module.css';
 
-const firstPaint = (grid: CellInterface[]): CellInterface[] => {
+const firstPaint = (
+  grid: CellInterface[],
+  totalGridCells?: number,
+): CellInterface[] => {
   const nextGrid: CellInterface[] = [];
-  for (let i = 0; i < TOTAL_GRID_CELLS; i++) {
+  const total = totalGridCells || TOTAL_GRID_CELLS;
+  for (let i = 0; i < total; i++) {
     let cell = grid[i];
     let R = Math.random();
     if (R <= 0.5) {
