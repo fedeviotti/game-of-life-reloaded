@@ -35,7 +35,7 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
 
   React.useEffect(() => {
-    setGrid(firstPaint(grid, gridStore?.totalGridCells));
+    setGrid(firstPaint(grid));
   }, []);
 
   React.useEffect(() => {
@@ -45,7 +45,7 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
   React.useEffect(() => {
     if (reset) {
       if (gridStore?.gridFromFile) setGrid(gridStore?.gridFromFile);
-      else setGrid(firstPaint(grid, gridStore?.totalGridCells));
+      else setGrid(firstPaint(grid));
       onResetComplete();
     }
   }, [reset]);
