@@ -6,6 +6,7 @@ import { firstPaint } from '../utils/first-paint';
 import { GameOfLifeGridState } from '../store/slices/game-of-life-grid-slice';
 import { COLS, ROWS } from '../constants/grid-info';
 import styles from '../styles/game-of-life-grid.module.css';
+import Spinner from './spinner';
 
 export interface CellInterface {
   id: string;
@@ -33,13 +34,18 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
 }) => {
   // window.console.log('[GameOfLifeGrid Render]');
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setGrid(firstPaint(grid));
   }, []);
 
   React.useEffect(() => {
+    setLoading(true);
     if (gridStore?.gridFromFile) setGrid(gridStore.gridFromFile);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }, [gridStore?.gridFromFile]);
 
   React.useEffect(() => {
@@ -63,20 +69,26 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
     };
   }, [isRunning, grid]);
 
-  return (
-    <div
-      style={{
-        gridTemplateRows: `repeat(${gridStore?.rows || ROWS}, minmax(0, 1fr))`,
-        gridTemplateColumns: `repeat(${
-          gridStore?.cols || COLS
-        }, minmax(0, 1fr))`,
-      }}
-      className={styles.gridContainer}
-    >
-      {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
-      {grid.map((cell) => {
-        return <div key={cell.id} className={cell.className} />;
-      })}
+  return loading ? (
+    <Spinner />
+  ) : (
+    <div className="flex justify-center items-center w-4/5 min-h-[75vh]">
+      <div
+        style={{
+          gridTemplateRows: `repeat(${
+            gridStore?.rows || ROWS
+          }, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${
+            gridStore?.cols || COLS
+          }, minmax(0, 1fr))`,
+        }}
+        className={styles.gridContainer}
+      >
+        {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
+        {grid.map((cell) => {
+          return <div key={cell.id} className={cell.className} />;
+        })}
+      </div>
     </div>
   );
 };

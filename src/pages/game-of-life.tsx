@@ -29,7 +29,7 @@ const GameOfLife: React.FC = () => {
     setCounter((prevState) => prevState + increment);
 
   return (
-    <div className="flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center">
+    <div className="flex flex-col md:flex-row gap-5s items-center justify-center md:justify-around min-h-[75vh]">
       <div className="flex flex-col gap-5 items-center">
         <Dropzone />
         <div className="flex gap-5">
