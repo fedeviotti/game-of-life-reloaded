@@ -1,49 +1,33 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CellInterface } from '../../components/game-of-life-grid';
 
 export interface GameOfLifeGridState {
-  generationCounter: number;
-  rows: number;
-  cols: number;
-  initialGrid: boolean[][];
+  counterFromFile?: number;
+  gridFromFile?: CellInterface[];
+  rows?: number;
+  cols?: number;
+  totalGridCells?: number;
+  isGridLoading?: boolean;
 }
 
-const initialState: GameOfLifeGridState = {
-  generationCounter: 0,
-  rows: 0,
-  cols: 0,
-  initialGrid: [],
-};
+const initialState: GameOfLifeGridState = {};
 
 export const gameOfLifeGridSlice = createSlice({
   name: 'gameOfLifeGridSlice',
   initialState,
   reducers: {
-    initializeGrid: (
-      state,
-      action: PayloadAction<{
-        generationCounter: number;
-        rows: number;
-        cols: number;
-        initialGrid: boolean[][];
-      }>,
-    ) => {
-      state.generationCounter = action.payload.generationCounter;
-      state.rows = action.payload.rows;
-      state.cols = action.payload.cols;
-      state.initialGrid = action.payload.initialGrid;
+    loadGridFromFile: (state, action: PayloadAction<GameOfLifeGridState>) => ({
+      ...action.payload,
+      totalGridCells:
+        (action?.payload?.rows || 0) * (action?.payload?.cols || 0),
+    }),
+    toggleIsGridLoading: (state, action: PayloadAction<boolean>) => {
+      state.isGridLoading = action.payload;
     },
-    resetGrid: (state) => {
-      state.generationCounter = initialState.generationCounter;
-      state.rows = initialState.rows;
-      state.cols = initialState.cols;
-      state.initialGrid = initialState.initialGrid;
-    },
-    setRows: (state, action: PayloadAction<{ rows: number }>) => {
-      state.rows = action.payload.rows;
-    },
+    resetGrid: () => ({}),
   },
 });
 
-export const { initializeGrid, resetGrid, setRows } =
+export const { loadGridFromFile, resetGrid, toggleIsGridLoading } =
   gameOfLifeGridSlice.actions;
 export const gameOfLifeGridSliceReducer = gameOfLifeGridSlice.reducer;

@@ -1,178 +1,135 @@
 import * as React from 'react';
+import { Transition } from '@headlessui/react';
 
+import { calculate } from '../utils/calculate';
+import { createGrid } from '../utils/create-grid';
+import { firstPaint } from '../utils/first-paint';
+import { GameOfLifeGridState } from '../store/slices/game-of-life-grid-slice';
+import { COLS, ROWS } from '../constants/grid-info';
 import styles from '../styles/game-of-life-grid.module.css';
+import { useAppSelector } from '../store/hooks';
+import Spinner from './spinner';
 
-interface CellInterface {
+export interface CellInterface {
   id: string;
   currentState: number;
   nextState: number | null;
-}
-
-interface DomCellInterface {
-  id: string;
   className: string;
 }
 
-const MAX = 60;
+interface GameOfLifeGridProps {
+  isRunning: boolean;
+  timeoutDelay: number;
+  reset: boolean;
+  onResetComplete: () => void;
+  onCounterChange: (increment: number) => void;
+  gridStore?: GameOfLifeGridState;
+}
 
-const idOf = (h: number, v: number): string => `i-${h}-${v}`;
-
-const createCell = (h: number, v: number): CellInterface => ({
-  id: idOf(h, v),
-  currentState: 0,
-  nextState: null,
-});
-
-const initGrid = () => {
-  const grid: CellInterface[][] = [];
-  for (let i = 0; i < MAX; i++) {
-    grid[i] = [];
-    for (let j = 0; j < MAX; j++) {
-      grid[i][j] = { id: '', currentState: 0, nextState: null };
-    }
-  }
-  return grid;
-};
-
-const createGrid = (grid: CellInterface[][]) => {
-  for (let i = 0; i < MAX; i++) {
-    grid[i] = [];
-    for (let j = 0; j < MAX; j++) {
-      grid[i][j] = createCell(i, j);
-    }
-  }
-  return grid;
-};
-
-const firstPaint = (grid: CellInterface[][]): DomCellInterface[] => {
-  const firstDomCells: DomCellInterface[] = [];
-  for (let i = 0; i < MAX; i++) {
-    for (let j = 0; j < MAX; j++) {
-      let cell = grid[j][i];
-      let domCell = { id: cell.id, className: '' };
-      let R = Math.random();
-      if (R <= 0.5) {
-        cell.currentState = 0;
-        domCell.className = styles.dead;
-      } else {
-        cell.currentState = 1;
-        domCell.className = styles.live;
-      }
-      // if (
-      //   (i === 1 && j === 2) ||
-      //   (i === 2 && j === 3) ||
-      //   (i === 3 && j === 1) ||
-      //   (i === 3 && j === 2) ||
-      //   (i === 3 && j === 3)
-      // ) {
-      //   cell.currentState = 1;
-      //   domCell.className = styles.live;
-      // } else {
-      //   cell.currentState = 0;
-      //   domCell.className = styles.dead;
-      // }
-      firstDomCells.push(domCell);
-    }
-  }
-  return firstDomCells;
-};
-
-const neighboursCoords = (x: number, y: number) => ({
-  NW: x === 0 || y === 0 ? null : [x - 1, y - 1],
-  N: y === 0 ? null : [x, y - 1],
-  NE: x === MAX - 1 || y === 0 ? null : [x + 1, y - 1],
-  E: x === MAX - 1 ? null : [x + 1, y],
-  SE: x === MAX - 1 || y === MAX - 1 ? null : [x + 1, y + 1],
-  S: y === MAX - 1 ? null : [x, y + 1],
-  SW: y === MAX - 1 || x === 0 ? null : [x - 1, y + 1],
-  W: x === 0 ? null : [x - 1, y],
-});
-
-const getNextState = (
-  x: number,
-  y: number,
-  grid: CellInterface[][],
-): CellInterface => {
-  let liveNeighbours = 0;
-  let nbrs = neighboursCoords(x, y);
-
-  Object.values(nbrs)
-    .filter((i) => i !== null)
-    // @ts-ignore
-    .forEach(([nX, nY]) => {
-      liveNeighbours += grid[nX][nY].currentState;
-    });
-
-  let currentCell = grid[x][y];
-
-  if (currentCell.currentState === 0 && liveNeighbours === 3) {
-    currentCell.nextState = 1;
-  } else if (
-    currentCell.currentState === 1 &&
-    (liveNeighbours < 2 || liveNeighbours > 3)
-  ) {
-    currentCell.nextState = 0;
-  } else {
-    currentCell.nextState = currentCell.currentState;
-  }
-  return currentCell;
-};
-
-const calculate = function (grid: CellInterface[][]): {
-  nextGrid: CellInterface[][];
-  nextDomCells: DomCellInterface[];
-} {
-  const nextDomCells: DomCellInterface[] = [];
-  const nextGrid: CellInterface[][] = initGrid();
-  for (let i = 0; i < MAX; i++) {
-    for (let j = 0; j < MAX; j++) {
-      const cell: CellInterface = getNextState(j, i, grid);
-      nextGrid[j][i] = {
-        id: cell.id,
-        currentState: cell.nextState as number,
-        nextState: null,
-      };
-      nextDomCells.push({
-        id: cell.id,
-        className: cell.nextState === 1 ? styles.new : styles.dead,
-      });
-    }
-  }
-  window.console.log('[nextGrid]', nextGrid);
-  window.console.log('[nextDomCells]', nextDomCells);
-  return { nextGrid, nextDomCells };
-};
-
-const GameOfLifeGrid: React.FC = () => {
-  const [grid, setGrid] = React.useState<CellInterface[][]>(createGrid([]));
-  const [domCells, setDomCells] = React.useState<DomCellInterface[]>([]);
+const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
+  isRunning,
+  timeoutDelay,
+  reset,
+  onResetComplete,
+  onCounterChange,
+  gridStore,
+}) => {
+  // window.console.log('[GameOfLifeGrid Render]');
+  const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
+  const isGridLoading = useAppSelector(
+    (state) => state.gameOfLifeGrid.isGridLoading,
+  );
+  const [showGrid, setShowGrid] = React.useState<boolean>(true);
+  const [showSpinner, setShowSpinner] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    setDomCells(firstPaint(grid));
+    let timeout: NodeJS.Timeout;
+    if (isGridLoading === true) {
+      setShowGrid(!isGridLoading);
+      timeout = setTimeout(() => {
+        setShowSpinner(isGridLoading);
+      }, 300);
+    } else if (isGridLoading === false) {
+      setShowSpinner(isGridLoading);
+      timeout = setTimeout(() => {
+        setShowGrid(!isGridLoading);
+      }, 100);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isGridLoading]);
+
+  React.useEffect(() => {
+    setGrid(firstPaint(grid));
   }, []);
 
-  const run = () => {
-    const { nextGrid, nextDomCells } = calculate(grid);
-    setGrid(nextGrid);
-    setDomCells(nextDomCells);
-  };
+  React.useEffect(() => {
+    if (gridStore?.gridFromFile) setGrid(gridStore.gridFromFile);
+  }, [gridStore?.gridFromFile]);
 
   React.useEffect(() => {
-    setTimeout(() => {
-      run();
-    }, 100);
-  }, [domCells]);
+    if (reset) {
+      if (gridStore?.gridFromFile) setGrid(gridStore?.gridFromFile);
+      else setGrid(firstPaint(grid));
+      onResetComplete();
+    }
+  }, [reset]);
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isRunning) {
+      timeout = setTimeout(() => {
+        setGrid(calculate(grid, gridStore));
+        onCounterChange(1);
+      }, timeoutDelay);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isRunning, grid]);
 
   return (
-    <>
-      <button onClick={run}>Click</button>
-      <div className={styles.gridContainer}>
-        {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
-        {domCells.map((domCell) => {
-          return <div key={domCell.id} className={domCell.className} />;
-        })}
-      </div>
-    </>
+    <div className="flex justify-center items-center w-full min-h-[80vh]">
+      <Transition
+        show={showGrid}
+        appear={true}
+        enter="transition-opacity duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-300"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <div
+          style={{
+            gridTemplateRows: `repeat(${
+              gridStore?.rows || ROWS
+            }, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${
+              gridStore?.cols || COLS
+            }, minmax(0, 1fr))`,
+          }}
+          className={styles.gridContainer}
+        >
+          {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
+          {grid.map((cell) => {
+            return <div key={cell.id} className={cell.className} />;
+          })}
+        </div>
+      </Transition>
+      <Transition
+        show={showSpinner}
+        enter="transition-opacity duration-100"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-100"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <Spinner />
+      </Transition>
+    </div>
   );
 };
 
