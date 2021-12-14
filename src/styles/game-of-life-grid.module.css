@@ -1,0 +1,29 @@
+.gridContainer {
+    @apply grid;
+    grid-gap: 1px;
+    /*margin: auto 5rem;*/
+    max-width: 900px;
+    @apply p-1;
+    @apply rounded bg-gray-700;
+}
+
+.gridContainer div {
+    /*background-color: red;*/
+    @apply h-4 md:h-7;
+    @apply w-4 md:w-7;
+    transition: all 0.2s;
+    @apply rounded-sm bg-gray-800;
+    @apply border border-solid border-gray-700;
+}
+
+.gridContainer .live {
+    @apply bg-red-500;
+}
+
+.gridContainer .dead {
+     /*background-color: black;*/
+}
+
+.gridContainer .new {
+    @apply bg-yellow-600;
+}
