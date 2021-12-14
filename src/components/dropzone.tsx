@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { useAppDispatch } from '../store/hooks';
 import {
   loadGridFromFile,
-  resetGrid,
+  toggleIsGridLoading,
 } from '../store/slices/game-of-life-grid-slice';
 import { CellInterface } from './game-of-life-grid';
 import styles from '../styles/game-of-life-grid.module.css';
@@ -14,6 +14,7 @@ import { calcY } from '../utils/calc-y';
 const Dropzone: React.FC = () => {
   const dispatch = useAppDispatch();
   const onDrop = useCallback((acceptedFiles) => {
+    dispatch(toggleIsGridLoading(true));
     acceptedFiles.forEach((file: Blob) => {
       const reader = new FileReader();
 
@@ -53,9 +54,12 @@ const Dropzone: React.FC = () => {
               };
             }
           });
-        dispatch(
-          loadGridFromFile({ counterFromFile, gridFromFile, rows, cols }),
-        );
+        setTimeout(() => {
+          dispatch(
+            loadGridFromFile({ counterFromFile, gridFromFile, rows, cols }),
+          );
+          dispatch(toggleIsGridLoading(false));
+        }, 1400);
       };
       // TODO: can we use FileReader.readAsArrayBuffer() instead of readAsText()
       reader.readAsText(file);

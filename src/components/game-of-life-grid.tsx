@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Transition } from '@headlessui/react';
 
 import { calculate } from '../utils/calculate';
 import { createGrid } from '../utils/create-grid';
@@ -6,6 +7,7 @@ import { firstPaint } from '../utils/first-paint';
 import { GameOfLifeGridState } from '../store/slices/game-of-life-grid-slice';
 import { COLS, ROWS } from '../constants/grid-info';
 import styles from '../styles/game-of-life-grid.module.css';
+import { useAppSelector } from '../store/hooks';
 import Spinner from './spinner';
 
 export interface CellInterface {
@@ -34,18 +36,36 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
 }) => {
   // window.console.log('[GameOfLifeGrid Render]');
   const [grid, setGrid] = React.useState<CellInterface[]>(createGrid([]));
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const isGridLoading = useAppSelector(
+    (state) => state.gameOfLifeGrid.isGridLoading,
+  );
+  const [showGrid, setShowGrid] = React.useState<boolean>(true);
+  const [showSpinner, setShowSpinner] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isGridLoading === true) {
+      setShowGrid(!isGridLoading);
+      timeout = setTimeout(() => {
+        setShowSpinner(isGridLoading);
+      }, 300);
+    } else if (isGridLoading === false) {
+      setShowSpinner(isGridLoading);
+      timeout = setTimeout(() => {
+        setShowGrid(!isGridLoading);
+      }, 100);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isGridLoading]);
 
   React.useEffect(() => {
     setGrid(firstPaint(grid));
   }, []);
 
   React.useEffect(() => {
-    setLoading(true);
     if (gridStore?.gridFromFile) setGrid(gridStore.gridFromFile);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   }, [gridStore?.gridFromFile]);
 
   React.useEffect(() => {
@@ -69,26 +89,46 @@ const GameOfLifeGrid: React.FC<GameOfLifeGridProps> = ({
     };
   }, [isRunning, grid]);
 
-  return loading ? (
-    <Spinner />
-  ) : (
-    <div className="flex justify-center items-center w-4/5 min-h-[75vh]">
-      <div
-        style={{
-          gridTemplateRows: `repeat(${
-            gridStore?.rows || ROWS
-          }, minmax(0, 1fr))`,
-          gridTemplateColumns: `repeat(${
-            gridStore?.cols || COLS
-          }, minmax(0, 1fr))`,
-        }}
-        className={styles.gridContainer}
+  return (
+    <div className="flex justify-center items-center w-full min-h-[80vh]">
+      <Transition
+        show={showGrid}
+        appear={true}
+        enter="transition-opacity duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-300"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
-        {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
-        {grid.map((cell) => {
-          return <div key={cell.id} className={cell.className} />;
-        })}
-      </div>
+        <div
+          style={{
+            gridTemplateRows: `repeat(${
+              gridStore?.rows || ROWS
+            }, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${
+              gridStore?.cols || COLS
+            }, minmax(0, 1fr))`,
+          }}
+          className={styles.gridContainer}
+        >
+          {/*<pre>{JSON.stringify(domCells, null, 2)}</pre>*/}
+          {grid.map((cell) => {
+            return <div key={cell.id} className={cell.className} />;
+          })}
+        </div>
+      </Transition>
+      <Transition
+        show={showSpinner}
+        enter="transition-opacity duration-100"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-100"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <Spinner />
+      </Transition>
     </div>
   );
 };

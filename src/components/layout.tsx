@@ -227,8 +227,8 @@ export default function Layout() {
           </div>
         </header>
         <main>
-          <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div className="px-4 py-6 sm:px-0">
+          <div className="max-w-7xl mx-auto">
+            <div className="px-0 sm:px-4 py-0 sm:py-6">
               <Outlet />
             </div>
           </div>

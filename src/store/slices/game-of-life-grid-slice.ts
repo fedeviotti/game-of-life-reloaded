@@ -7,6 +7,7 @@ export interface GameOfLifeGridState {
   rows?: number;
   cols?: number;
   totalGridCells?: number;
+  isGridLoading?: boolean;
 }
 
 const initialState: GameOfLifeGridState = {};
@@ -20,9 +21,13 @@ export const gameOfLifeGridSlice = createSlice({
       totalGridCells:
         (action?.payload?.rows || 0) * (action?.payload?.cols || 0),
     }),
+    toggleIsGridLoading: (state, action: PayloadAction<boolean>) => {
+      state.isGridLoading = action.payload;
+    },
     resetGrid: () => ({}),
   },
 });
 
-export const { loadGridFromFile, resetGrid } = gameOfLifeGridSlice.actions;
+export const { loadGridFromFile, resetGrid, toggleIsGridLoading } =
+  gameOfLifeGridSlice.actions;
 export const gameOfLifeGridSliceReducer = gameOfLifeGridSlice.reducer;
